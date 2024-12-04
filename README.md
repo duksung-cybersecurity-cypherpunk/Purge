@@ -1,15 +1,5 @@
 Purge
 
-requirements
-Flask==2.2.5  
-keras-facenet==0.3.2  
-mtcnn==0.1.1  
-facenet-pytorch==2.5.2  
-chromadb==0.4.0  
-mediapipe==0.9.1  
-opencv-python==4.7.0.72  
-Pillow==9.4.0  
-numpy==1.24.3  
 ---
 소개 
 Purge는 얼굴 인식 및 데이터베이스 검색 기술을 활용하여 디지털 성범죄 피해자들이 유해 콘텐츠를 탐지하고 증거를 확보할 수 있도록 돕는 프로젝트입니다.
@@ -82,3 +72,15 @@ Purge는 얼굴 인식 및 데이터베이스 검색 기술을 활용하여 디�
 - video_to_chroma.py: 동영상에서 얼굴 데이터를 추출하고 ChromaDB에 저장
 - remove_collection.py: ChromaDB에서 특정 컬렉션을 삭제
 
+---
+requirements
+
+Flask==2.2.5  
+keras-facenet==0.3.2  
+mtcnn==0.1.1  
+facenet-pytorch==2.5.2  
+chromadb==0.4.0  
+mediapipe==0.9.1  
+opencv-python==4.7.0.72  
+Pillow==9.4.0  
+numpy==1.24.3
