@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Scan</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/facemesh"></script>
+
+    <style>
+        body {
+            background-color: black;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        #countdown {
+            font-size: 2rem;
+            text-align: center;
+        }
+        #video {
+            display: none;
+        }
+        #captureButton {
+            display: none;
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 1.2rem;
+            background-color: white;
+            color: black;
+            border: none;
+            cursor: pointer;
+        }
+        #captureButton:hover {
+            background-color: gray;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Face Scan</h1>
+        <form id="uploadForm" method="POST" enctype="multipart/form-data" action="/upload_image">
+            <input type="file" name="image_file" accept="image/*" required>
+            <button type="submit">Upload Image</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('uploadForm').onsubmit = function(event) {
+            event.preventDefault(); // 기본 동작 방지
+            const formData = new FormData(document.getElementById('uploadForm'));
+            fetch('/upload_image', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (response.redirected) {
+                    window.location.href = response.url;
+                } else {
+                    throw new Error('An error occurred during the upload.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert("Failed to upload the image.");
+            });
+        };
+    </script> 
+</body>
+</html>

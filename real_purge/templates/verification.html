@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verification Page</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+        .container {
+            text-align: center;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+        .container h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .container input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+        .container button {
+            padding: 10px 20px;
+            background-color: #11024F;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+        .container button:hover {
+            background-color: #0d0138;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Verification</h1>
+        <form action="/verify" method="POST">
+            <input type="text" name="userID" placeholder="Enter your ID" id="userID" required>
+            <input type="password" name="userPassword" placeholder="Enter your Password" id="userPassword" required>
+            <button type="submit">Verify</button>
+        </form>
+    </div>
+
+    <script>
+        function generateRandomNickname() {
+            const adjectives = ["blue", "green", "red", "yellow", "black", "white"];
+            const animals = ["cat", "dog", "fox", "wolf", "tiger", "eagle"];
+            const randomAdjective = adjectives[Math.floor(Math.random() * adjectives.length)];
+            const randomAnimal = animals[Math.floor(Math.random() * animals.length)];
+            return randomAdjective + randomAnimal;
+        }
+
+        function goToPurgePage() {
+            const nickname = generateRandomNickname();
+            localStorage.setItem('nickname', nickname);
+        }
+    </script>
+</body>
+</html>

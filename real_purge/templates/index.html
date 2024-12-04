@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Main Page</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #ffffff;
+        }
+        .container {
+            text-align: center;
+        }
+        .container h1 {
+            font-size: 20px;
+            margin: 0;
+        }
+        .line {
+            width: 1px;
+            height: 50px;
+            background-color: black;
+            margin: 20px auto;
+        }
+        .purge {
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            display: inline-block;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+        .purge:hover {
+            color: #11024F;
+            transform: translateY(-5px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Everyone has moments they'd like to erase.<br>Don't be afraid.</h1>
+        <div class="line"></div>
+        <div>
+            <span>Let's</span> <span class="purge" onclick="goToVerification()">Purge</span>
+        </div>
+
+        <form id="uploadForm" enctype="multipart/form-data">
+            <input type="file" name="json_file" id="json_file">
+            <button type="button" onclick="uploadJSON()">Upload JSON</button>
+        </form>
+    </div>
+
+    <script>
+        function goToVerification() {
+            window.location.href = "/verification";
+        }
+
+        function uploadJSON() {
+            var formData = new FormData();
+            var fileInput = document.getElementById('json_file');
+            formData.append('json_file', fileInput.files[0]);
+
+            fetch('/upload_json', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+                alert(data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</body>
+</html>

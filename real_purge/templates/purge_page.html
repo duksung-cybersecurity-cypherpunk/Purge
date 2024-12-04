@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purge Results</title>
+    <style>
+        body {
+            display: flex;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #ffffff;
+        }
+        .sidebar {
+            background-color: #11024F;
+            width: 60px;
+            transition: width 0.3s ease, border-radius 0.3s ease;
+            color: white;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            border-radius: 15px;
+            padding-top: 10px;
+            position: relative;
+        }
+        .sidebar.expanded {
+            width: 250px;
+        }
+        .sidebar .logo {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 10px 0;
+            background-color: #11024F;
+            color: white;
+            padding: 10px;
+            border-radius: 20px;
+            border: 2px solid white;
+            text-align: center;
+            transition: transform 0.2s ease, margin 0.2s ease, writing-mode 0.2s ease;
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+            overflow: visible;
+        }
+        .sidebar.expanded .logo {
+            font-size: 18px;
+            margin-left: 0;
+            transform: rotate(0deg);
+            writing-mode: horizontal-tb;
+        }
+        .sidebar .menu {
+            display: none;
+            width: 100%;
+            padding-left: 20px;
+            margin-top: 20px;
+        }
+        .sidebar.expanded .menu {
+            display: block;
+        }
+        .menu-item {
+            margin: 15px 0;
+        }
+        .submenu {
+            margin-left: 20px;
+            margin-top: 15px;
+        }
+        .submenu a {
+            color: white;
+            text-decoration: none;
+        }
+        .submenu a:hover {
+            text-decoration: underline;
+        }
+        .toggle-btn {
+            cursor: pointer;
+            font-size: 18px;
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+        }
+        .content {
+            flex-grow: 1;
+            padding: 20px;
+        }
+        .content .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .content .header img {
+            height: 50px;
+            margin-right: 10px;
+        }
+        .content .header .logo-title {
+            display: flex;
+            align-items: center;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .content .header .logo-group {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .content .header .search-results {
+            font-size: 18px;
+            color: #11024F;
+            font-weight: bold;
+            margin-left: 0;
+        }
+        .content .line {
+            border-top: 3px solid #000000;
+            margin: 10px 0;
+        }
+        .content .thin-line {
+            border-top: 1px solid #000000;
+            margin: 10px 0;
+        }
+        .selection-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .checkbox-block {
+            display: flex;
+            align-items: center;
+        }
+        .checkbox-block input {
+            margin-right: 10px;
+        }
+        .report-btn {
+            background-color: #FF0000;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .video-block {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .video-block img {
+            width: 100px;
+            height: 60px;
+            background-color: #e0e0e0;
+        }
+        .video-block .video-info {
+            flex-grow: 1;
+            margin-left: 10px;
+        }
+        .popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60%;
+            background-color: white;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            border-radius: 10px;
+            display: none;
+            z-index: 1000;
+        }
+        .popup .popup-content {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .popup .popup-item {
+            margin-bottom: 15px;
+        }
+        .popup .copy-btn {
+            margin-top: 10px;
+            background-color: #008CBA;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .blur-image {
+            filter: blur(5px);
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar" id="sidebar">
+        <div class="logo"></div>
+        <div class="menu">
+            <div class="menu-item">My page
+                <div class="submenu">
+                    <a href="{{ url_for('face_scan') }}">Face Scan</a>
+                </div>                
+            </div>
+            <div class="menu-item">Report
+                <div class="submenu">
+                    <a href="{{ url_for('report_status') }}">Report Status</a>
+                    <div>Reporting Agency</div>
+                    <a href="{{ url_for('report_history') }}">Report History</a>
+                </div>
+            </div>
+            <div class="menu-item">About
+                <div class="submenu">
+                    <div>Purge</div>
+                </div>
+            </div>
+        </div>
+        <div class="toggle-btn" onclick="toggleSidebar()" id="toggle-btn"> >></div>
+    </div>
+
+    <div class="content">
+        <div class="header">
+            <img src="/static/images/덤보문어로고.png" alt="Logo">
+            <div class="logo-group">
+                <div class="logo-title">Purge</div>
+                <div class="search-results">Search Results</div>
+            </div>
+        </div>
+        <div class="line"></div>
+
+        <div class="selection-row">
+            <div class="checkbox-block">
+                <input type="checkbox" id="selectAll" onclick="selectAllCheckboxes(this)">
+                <label for="selectAll">전체 선택</label>
+            </div>
+            <button class="report-btn" onclick="openPopup()">선택 항목 신고하기</button>
+        </div>
+        <div class="thin-line"></div>
+
+        <div id="checkboxList">
+            {% if match and similarity %}
+            <div class="video-block">
+                <input type="checkbox" class="item-checkbox">
+                <a href="{{ match }}" target="_blank">
+                <img src="{{ thumbnail_url }}" alt="Thumbnail" style="width: 120px; height: 90px;" class="blur-image">
+                </a>
+                <div class="video-info">
+                    <strong>{{ match }}</strong><br>
+                    2024-09-11<br>
+                    사이트 (조회수)
+                </div>
+            </div>
+            {% else %}
+            <p class='no-match'>이 페이지에 접근할 수 없습니다. face_scan 페이지에서 접근하세요.</p>
+            {% endif %}
+        </div>
+
+        <div class="popup" id="popup">
+            <h2>신고 내용</h2>
+            <div class="popup-content" id="popupContent">
+            </div>
+            <button onclick="closePopup()">닫기</button>
+        </div>
+    </div>
+
+    <script>
+        function displayNickname() {
+            var nickname = localStorage.getItem('nickname');
+            if (nickname) {
+                document.querySelector('.logo').textContent = nickname;
+                }
+            }
+            
+        // 페이지 로드 시 닉네임을 자동으로 표시
+        window.onload = function() {
+            displayNickname();
+            };
+            
+        // 사이드바 토글 기능
+        function toggleSidebar() {
+            var sidebar = document.getElementById('sidebar');
+            var toggleBtn = document.getElementById('toggle-btn');
+            sidebar.classList.toggle('expanded');
+            if (sidebar.classList.contains('expanded')) {
+                toggleBtn.textContent = '<<';
+            } else {
+                toggleBtn.textContent = '>>';
+            }
+            displayNickname();
+            }
+
+
+        function openPopup() {
+            var checkboxes = document.querySelectorAll('.item-checkbox');
+            var popupContent = document.getElementById('popupContent');
+            popupContent.innerHTML = '';
+
+            checkboxes.forEach(function(checkbox) {
+                if (checkbox.checked) {
+                    var videoBlock = checkbox.closest('.video-block');
+                    var title = videoBlock.querySelector('strong').textContent;
+                    var img = videoBlock.querySelector('img').src;
+
+                    var formattedText = `${title}에 피해촬영물이 게시된 것을 확인하였습니다.\n검색 키워드는 {키워드} 입니다.\n영상, 사진 형태의 피해 촬영물은 다음과 같습니다.\n`;
+
+                    var popupItem = document.createElement('div');
+                    popupItem.className = 'popup-item';
+                    popupItem.innerHTML = formattedText + `<img src="${img}" alt="Video Thumbnail"><br>` + 
+                        `<button class="copy-btn" onclick="copyText('${title}', '${img}')">복사하기</button>`;
+                    popupContent.appendChild(popupItem);
+                }
+            });
+
+            document.getElementById('popup').style.display = 'block';
+        }
+
+        function closePopup() {
+            document.getElementById('popup').style.display = 'none';
+        }
+
+        function copyText(title, imgSrc) {
+            var text = `${title}에 피해촬영물이 게시된 것을 확인하였습니다.\n검색 키워드는 {키워드} 입니다.\n영상, 사진 형태의 피해 촬영물은 다음과 같습니다.\n${imgSrc}`;
+            var tempElement = document.createElement('textarea');
+            tempElement.value = text;
+            document.body.appendChild(tempElement);
+            tempElement.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempElement);
+            alert('복사되었습니다.');
+        }
+    </script>
+</body>
+</html>
