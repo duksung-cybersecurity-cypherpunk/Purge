@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report History</title>
+    <style>
+        body {
+            display: flex;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #ffffff;
+        }
+        .sidebar {
+            background-color: #11024F;
+            width: 60px;
+            transition: width 0.3s ease, border-radius 0.3s ease;
+            color: white;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            border-radius: 15px;
+            padding-top: 10px;
+            position: relative;
+        }
+        .sidebar.expanded {
+            width: 250px;
+        }
+        .sidebar .logo {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 10px 0;
+            background-color: #11024F;
+            color: white;
+            padding: 10px;
+            border-radius: 20px;
+            border: 2px solid white;
+            text-align: center;
+            transition: transform 0.2s ease, margin 0.2s ease, writing-mode 0.2s ease;
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+        }
+        .sidebar.expanded .logo {
+            margin-left: 0;
+            transform: rotate(0deg);
+            writing-mode: horizontal-tb;
+        }
+        .sidebar .menu {
+            display: none;
+            width: 100%;
+            padding-left: 20px;
+            margin-top: 20px;
+        }
+        .sidebar.expanded .menu {
+            display: block;
+        }
+        .menu-item {
+            margin: 15px 0;
+        }
+        .submenu {
+            margin-left: 20px;
+            margin-top: 15px;
+        }
+        .submenu a {
+            color: white;
+            text-decoration: none;
+        }
+        .submenu a:hover {
+            text-decoration: underline;
+        }
+        .toggle-btn {
+            cursor: pointer;
+            font-size: 18px;
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+        }
+        .content {
+            flex-grow: 1;
+            padding: 20px;
+        }
+        .content .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .content .header img {
+            height: 50px;
+            margin-right: 10px;
+        }
+        .content .header .logo-title {
+            display: flex;
+            align-items: center;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .content .header .logo-group {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .content .header .report-history {
+            font-size: 18px;
+            color: #11024F;
+            font-weight: bold;
+            margin-left: 0;
+        }
+        .filters {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            border-top: 3px solid #000000;
+            padding-top: 10px;
+        }
+        .filters div {
+            display: flex;
+            align-items: center;
+        }
+        .filters input, .filters select {
+            margin-left: 10px;
+            padding: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            width: 150px;
+        }
+        .filters input[type="date"] {
+            padding-right: 10px;
+        }
+        .filters button {
+            padding: 5px 10px;
+            background-color: #11024F;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .filters {
+            border-bottom: 1px solid #000000;
+            padding-bottom: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #f0f0f0;
+        }
+        .report-btn {
+            background-color: #11024F;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar" id="sidebar">
+        <div class="logo"></div>
+        <div class="menu">
+            <div class="menu-item">My page
+                <div class="submenu">
+                    <div>Face Scan</div>
+                </div>
+            </div>
+            <div class="menu-item">Report
+                <div class="submenu">
+                    <a href="report_status.html">Report Status</a>
+                    <div>Reporting Agency</div>
+                    <a href="report_history.html" class="active">Report History</a>
+                </div>
+            </div>
+            <div class="menu-item">About
+                <div class="submenu">
+                    <div>Purge</div>
+                </div>
+            </div>
+        </div>
+        <div class="toggle-btn" onclick="toggleSidebar()" id="toggle-btn">
+            >>
+        </div>
+    </div>
+    <div class="content">
+        <div class="header">
+            <a href="purge_page.html"><img src="덤보문어로고.png" alt="Logo"></a>
+            <div class="logo-group">
+                <div class="logo-title">Purge</div>
+                <div class="report-history">Report History</div>
+            </div>
+        </div>
+        <div class="filters">
+            <div>
+                <label for="report-date-start">신고 일자</label>
+                <input type="date" id="report-date-start">
+                ~
+                <input type="date" id="report-date-end">
+            </div>
+            <div>
+                <label for="agency">신고 기관</label>
+                <select id="agency">
+                    <option value="all">전체</option>
+                    <option value="한국여성인권진흥원">한국여성인권진흥원</option>
+                    <option value="B">B 기관</option>
+                    <option value="C">C 기관</option>
+                    <option value="D">D 기관</option>
+                </select>
+            </div>
+            <button onclick="filterReports()">조회</button>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>신고 일자</th>
+                    <th>신고 기관</th>
+                    <th>소요된 기간</th>
+                    <th>지원 보고서</th>
+                </tr>
+            </thead>
+            <tbody id="reportTableBody">
+                <tr>
+                    <td>2020-03-05</td>
+                    <td>한국여성인권진흥원</td>
+                    <td>2020-03-07~2020-04-01</td>
+                    <td><a href="#" class="report-btn">보고서 확인</a></td>
+                </tr>
+                <tr>
+                    <td>2020-03-07</td>
+                    <td>한국여성인권진흥원</td>
+                    <td>2020-03-10~2020-04-02</td>
+                    <td><a href="#" class="report-btn">보고서 확인</a></td>
+                </tr>
+                <tr>
+                    <td>2020-03-15</td>
+                    <td>한국여성인권진흥원</td>
+                    <td>2020-03-20~2020-04-06</td>
+                    <td><a href="#" class="report-btn">보고서 확인</a></td>
+                </tr>
+                <tr>
+                    <td>2020-04-15</td>
+                    <td>한국여성인권진흥원</td>
+                    <td>2020-04-16~2020-04-30</td>
+                    <td><a href="#" class="report-btn">보고서 확인</a></td>
+                </tr>
+                <tr>
+                    <td>2020-04-15</td>
+                    <td>한국여성인권진흥원</td>
+                    <td>2020-04-19~2020-06-14</td>
+                    <td><a href="#" class="report-btn">보고서 확인</a></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function toggleSidebar() {
+            var sidebar = document.getElementById('sidebar');
+            var toggleBtn = document.getElementById('toggle-btn');
+            sidebar.classList.toggle('expanded');
+            if (sidebar.classList.contains('expanded')) {
+                toggleBtn.textContent = '<<';
+            } else {
+                toggleBtn.textContent = '>>';
+            }
+            var nickname = localStorage.getItem('nickname');
+            document.querySelector('.logo').textContent = nickname;
+        }
+
+        function filterReports() {
+            // 필터링 조건
+            var startDate = document.getElementById('report-date-start').value;
+            var endDate = document.getElementById('report-date-end').value;
+            var agency = document.getElementById('agency').value;
+
+            // 테이블 필터링
+            var rows = document.querySelectorAll("#reportTableBody tr");
+
+            rows.forEach(row => {
+                var reportDate = row.cells[0].textContent;
+                var reportAgency = row.cells[1].textContent;
+
+                var showRow = true;
+
+                // 날짜 필터링
+                if (startDate && endDate) {
+                    if (reportDate < startDate || reportDate > endDate) {
+                        showRow = false;
+                    }
+                }
+
+                // 기관 필터링
+                if (agency !== "all" && reportAgency !== agency) {
+                    showRow = false;
+                }
+
+                // 필터 조건에 맞는 행만 표시
+                if (showRow) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            });
+        }
+
+        // Set nickname when page loads
+        window.onload = function() {
+            var nickname = localStorage.getItem('nickname');
+            document.querySelector('.logo').textContent = nickname;
+        };
+    </script>
+</body>
+</html>
+

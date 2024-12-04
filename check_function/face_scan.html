@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Scan</title>
+    <style>
+        body {
+            background-color: black;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        #countdown {
+            font-size: 2rem;
+            text-align: center;
+        }
+        #video {
+            display: none;
+        }
+        #captureButton {
+            display: none;
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 1.2rem;
+            background-color: white;
+            color: black;
+            border: none;
+            cursor: pointer;
+        }
+        #captureButton:hover {
+            background-color: gray;
+        }
+    </style>
+</head>
+<body>
+    <div id="countdown">3초 이내로 사진 촬영이 시작됩니다.</div>
+    <video id="video" width="640" height="480" autoplay></video>
+    <canvas id="canvas" style="display:none;"></canvas>
+    <button id="captureButton">사진 찍기</button>
+
+    <script>
+        let countdownElement = document.getElementById('countdown');
+        let captureButton = document.getElementById('captureButton');
+        let countdown = 3;
+
+        // 1초마다 카운트다운 업데이트
+        const countdownInterval = setInterval(() => {
+            countdownElement.textContent = `${countdown}초 이내로 사진 촬영이 시작됩니다.`;
+            countdown--;
+
+            if (countdown < 0) {
+                clearInterval(countdownInterval);
+                startVideo();
+            }
+        }, 1000);
+
+        function startVideo() {
+            countdownElement.style.display = 'none';
+            const video = document.getElementById('video');
+            video.style.display = 'block';
+            captureButton.style.display = 'block'; // 버튼 표시
+
+            // 웹캠 시작
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(stream => {
+                    video.srcObject = stream;
+                })
+                .catch(err => {
+                    console.error("웹캠 접근 에러:", err);
+                });
+        }
+
+        captureButton.addEventListener('click', captureImage);
+
+        function captureImage() {
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            const context = canvas.getContext('2d');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // Blob으로 무손실 PNG 형식으로 이미지 전송
+            canvas.toBlob(function(blob) {
+                sendImageToServer(blob);
+            }, 'image/png');
+        }
+
+        function sendImageToServer(blob) {
+            const formData = new FormData();
+            formData.append('image', blob, 'capture.png');
+
+            fetch('http://127.0.0.1:8000/upload-image', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('서버 응답:', data);
+
+                if (data.status === 'success') {
+                    // Store the matching URLs in localStorage
+                    localStorage.setItem('matching_urls', JSON.stringify(data.matching_urls));
+
+                    // Redirect to purge_page.html
+                    window.location.href = 'purge_page.html';
+                } else {
+                    alert(data.message || 'Error occurred during image processing.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report Status</title>
+    <style>
+        body {
+            display: flex;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #ffffff;
+        }
+        .sidebar {
+            background-color: #11024F;
+            width: 60px;
+            transition: width 0.3s ease, border-radius 0.3s ease;
+            color: white;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            border-radius: 15px;
+            padding-top: 10px;
+            position: relative;
+        }
+        .sidebar.expanded {
+            width: 250px;
+        }
+        .sidebar .logo {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 10px 0;
+            background-color: #11024F;
+            color: white;
+            padding: 10px;
+            border-radius: 20px;
+            border: 2px solid white;
+            text-align: center;
+            transition: transform 0.2s ease, margin 0.2s ease, writing-mode 0.2s ease;
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+        }
+        .sidebar.expanded .logo {
+            margin-left: 0;
+            transform: rotate(0deg);
+            writing-mode: horizontal-tb;
+        }
+        .sidebar .menu {
+            display: none;
+            width: 100%;
+            padding-left: 20px;
+            margin-top: 20px;
+        }
+        .sidebar.expanded .menu {
+            display: block;
+        }
+        .menu-item {
+            margin: 15px 0;
+        }
+        .submenu {
+            margin-left: 20px;
+            margin-top: 15px;
+        }
+        .submenu a {
+            color: white;
+            text-decoration: none;
+        }
+        .submenu a:hover {
+            text-decoration: underline;
+        }
+        .submenu a.active {
+            color: #11024F;
+            font-weight: bold;
+        }
+        .toggle-btn {
+            cursor: pointer;
+            font-size: 18px;
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+        }
+        .content {
+            flex-grow: 1;
+            padding: 20px;
+        }
+        .content .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .content .header img {
+            height: 50px;
+            margin-right: 10px;
+        }
+        .content .header .logo-title {
+            display: flex;
+            align-items: center;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .content .header .logo-group {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .content .header .report-status {
+            font-size: 18px;
+            color: #11024F;
+            font-weight: bold;
+            margin-left: 0;
+        }
+        .content .filters {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            border-top: 3px solid #000000;
+            padding-top: 10px;
+        }
+        .filters div {
+            display: flex;
+            align-items: center;
+        }
+        .filters input, .filters select {
+            margin-left: 10px;
+            padding: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            width: 150px;
+        }
+        .filters input[type="date"] {
+            padding-right: 10px;
+        }
+        .filters button {
+            padding: 5px 10px;
+            background-color: #11024F;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .filters {
+            border-bottom: 1px solid #000000;
+            padding-bottom: 10px;
+        }
+        .summary {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .summary div {
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 23%;
+            background-color: #f9f9f9;
+            font-weight: bold;
+        }
+        .summary div span {
+            font-size: 24px;
+            color: #000000;
+            font-weight: bold;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+        th, td {
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+        }
+        th {
+            background-color: #f0f0f0;
+        }
+        .popup {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60%;
+            height: 70%;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            border-radius: 10px;
+            display: none;
+            z-index: 10;
+            overflow-y: auto;
+        }
+        .popup .popup-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .popup .popup-header h2 {
+            font-size: 24px;
+            margin: 0;
+        }
+        .popup .popup-header span {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .popup .video-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .popup .video-item img {
+            width: 150px;
+            height: 100px;
+            margin-right: 10px;
+            background-color: #ddd;
+        }
+        .popup .close-btn {
+            text-align: right;
+            margin-top: 10px;
+        }
+        .popup .close-btn button {
+            background-color: #11024F;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar" id="sidebar">
+        <div class="logo"></div>
+        <div class="menu">
+            <div class="menu-item">My page
+                <div class="submenu">
+                    <div>Face Scan</div>
+                </div>
+            </div>
+            <div class="menu-item">Report
+                <div class="submenu">
+                    <a href="report_status.html">Report Status</a>
+                    <div>Reporting Agency</div>
+                    <a href="report_history.html">Report History</a>
+                </div>
+            </div>
+            <div class="menu-item">About
+                <div class="submenu">
+                    <a href="purge_page.html">Purge</a>
+                </div>
+            </div>
+        </div>
+        <div class="toggle-btn" onclick="toggleSidebar()" id="toggle-btn">
+            >>
+        </div>
+    </div>
+    <div class="content">
+        <div class="header">
+            <a href="purge_page.html"><img src="덤보문어로고.png" alt="Logo"></a>
+            <div class="logo-group">
+                <div class="logo-title" onclick="location.href='purge_page.html'">Purge</div>
+                <div class="report-status">Report Status</div>
+            </div>
+        </div>
+        <div class="filters">
+            <div>
+                <label for="report-date-start">신고 일자</label>
+                <input type="date" id="report-date-start">
+                ~
+                <input type="date" id="report-date-end">
+            </div>
+            <div>
+                <label for="agency">신고 기관</label>
+                <select id="agency">
+                    <option value="all">전체</option>
+                    <option value="한국여성인권진흥원">한국여성인권진흥원</option>
+                    <option value="B">B 기관</option>
+                    <option value="C">C 기관</option>
+                    <option value="D">D 기관</option>
+                </select>
+            </div>
+            <button onclick="filterReports()">조회</button>
+        </div>
+        <div class="summary">
+            <div>접수 대기중 <span id="pending-count">0건</span></div>
+            <div>삭제 처리중 <span id="processing-count">0건</span></div>
+            <div>삭제 완료 <span id="completed-count">0건</span></div>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>신고 일자</th>
+                    <th>신고 기관</th>
+                    <th>신고 영상물</th>
+                    <th>처리 상태</th>
+                </tr>
+            </thead>
+            <tbody id="reportTableBody">
+                <tr onclick="showPopup('플랫폼A', 5)">
+                    <td>2024-03-05</td>
+                    <td>한국여성인권진흥원</td>
+                    <td>5건</td>
+                    <td>삭제 완료</td>
+                </tr>
+                <tr onclick="showPopup('플랫폼B', 15)">
+                    <td>2024-04-07</td>
+                    <td>한국여성인권진흥원</td>
+                    <td>15건</td>
+                    <td>삭제 처리중</td>
+                </tr>
+                <tr onclick="showPopup('플랫폼C', 3)">
+                    <td>2024-05-15</td>
+                    <td>한국여성인권진흥원</td>
+                    <td>3건</td>
+                    <td>삭제 처리중</td>
+                </tr>
+                <tr onclick="showPopup('플랫폼C', 6)">
+                    <td>2024-06-12</td>
+                    <td>한국여성인권진흥원</td>
+                    <td>6건</td>
+                    <td>접수 대기중</td>
+                </tr>
+                <tr onclick="showPopup('플랫폼D', 14)">
+                    <td>2024-07-15</td>
+                    <td>한국여성인권진흥원</td>
+                    <td>14건</td>
+                    <td>접수 대기중</td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="popup" id="popup">
+            <div class="popup-header">
+                <h2>신고 영상물</h2>
+                <span id="popupCount">5건</span>
+            </div>
+            <div id="popupContent">
+                <!-- 비디오 아이템이 여기에 동적으로 추가될 것입니다 -->
+            </div>
+            <div class="close-btn"><button onclick="closePopup()">닫기</button></div>
+        </div>
+    </div>
+
+    <script>
+        function toggleSidebar() {
+            var sidebar = document.getElementById('sidebar');
+            var toggleBtn = document.getElementById('toggle-btn');
+            sidebar.classList.toggle('expanded');
+            if (sidebar.classList.contains('expanded')) {
+                toggleBtn.textContent = '<<';
+            } else {
+                toggleBtn.textContent = '>>';
+            }
+            var nickname = localStorage.getItem('nickname');
+            document.querySelector('.logo').textContent = nickname;
+        }
+
+        function filterReports() {
+            // 필터링 조건
+            var startDate = document.getElementById('report-date-start').value;
+            var endDate = document.getElementById('report-date-end').value;
+            var agency = document.getElementById('agency').value;
+
+            // 테이블 필터링
+            var rows = document.querySelectorAll("#reportTableBody tr");
+            var pendingCount = 0;
+            var processingCount = 0;
+            var completedCount = 0;
+
+            rows.forEach(row => {
+                var reportDate = row.cells[0].textContent;
+                var reportAgency = row.cells[1].textContent;
+                var reportStatus = row.cells[3].textContent;
+
+                var showRow = true;
+
+                // 날짜 필터링
+                if (startDate && endDate) {
+                    if (reportDate < startDate || reportDate > endDate) {
+                        showRow = false;
+                    }
+                }
+
+                // 기관 필터링
+                if (agency !== "all" && reportAgency !== agency) {
+                    showRow = false;
+                }
+
+                // 처리 상태 카운팅
+                if (showRow) {
+                    if (reportStatus === "접수 대기중") {
+                        pendingCount++;
+                    } else if (reportStatus === "삭제 처리중") {
+                        processingCount++;
+                    } else if (reportStatus === "삭제 완료") {
+                        completedCount++;
+                    }
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            });
+
+            // 상태 카운트 업데이트
+            document.getElementById("pending-count").textContent = pendingCount + "건";
+            document.getElementById("processing-count").textContent = processingCount + "건";
+            document.getElementById("completed-count").textContent = completedCount + "건";
+        }
+
+        function showPopup(platform, count) {
+            var popup = document.getElementById("popup");
+            var popupCount = document.getElementById("popupCount");
+            var popupContent = document.getElementById("popupContent");
+
+            popupCount.textContent = count + "건";
+
+            // 예시 데이터 생성 (동적으로 생성)
+            popupContent.innerHTML = "";
+            for (var i = 0; i < count; i++) {
+                var videoItem = document.createElement("div");
+                videoItem.className = "video-item";
+                videoItem.innerHTML = '<img src="#" alt="영상 길이"><div>영상 제목 ' + (i + 1) + '</div>';
+                popupContent.appendChild(videoItem);
+            }
+
+            popup.style.display = "block";
+        }
+
+        function closePopup() {
+            var popup = document.getElementById("popup");
+            popup.style.display = "none";
+        }
+
+        // Set nickname when page loads
+        window.onload = function() {
+            var nickname = localStorage.getItem('nickname');
+            document.querySelector('.logo').textContent = nickname;
+        };
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
