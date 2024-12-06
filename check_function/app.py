@@ -20,7 +20,7 @@ model = InceptionResnetV1(pretrained='vggface2').eval()  # FaceNet 얼굴 인식
 
 # ChromaDB 초기화
 def init_chroma_db():
-    persist_directory = "/Users/sinhyoseom/chroma_storage"
+    persist_directory = "{크로마DB저장경로}"
     client = PersistentClient(path=persist_directory)
     collection_name = "faces_nnnnn"
 
@@ -76,7 +76,7 @@ def find_matching_faces(db, face_vector, threshold=0.35):
 
     return list(matching_urls)
 
-THUMBNAIL_FOLDER = "/Users/sinhyoseom/Desktop/videos/thumbnails"
+THUMBNAIL_FOLDER = "{썸네일 저장 경로}"
 
 @app.route('/thumbnails/<filename>')
 def serve_thumbnail(filename):
