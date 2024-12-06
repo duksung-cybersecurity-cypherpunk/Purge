@@ -1,7 +1,7 @@
 from chromadb import PersistentClient
 
 # ChromaDB 클라이언트 생성
-persist_directory = "/Users/sinhyoseom/chroma_storage"
+persist_directory = "{크로마DB 저장 경로}"
 client = PersistentClient(path=persist_directory)
 
 # 삭제할 컬렉션 이름
