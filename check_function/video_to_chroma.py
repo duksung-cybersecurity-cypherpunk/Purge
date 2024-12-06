@@ -8,7 +8,7 @@ import chromadb
 from chromadb import PersistentClient
 
 def init_chroma_db():
-    persist_directory = "/Users/sinhyoseom/chroma_storage"
+    persist_directory = "{크로마DB 저장 경로}"
     client = PersistentClient(path=persist_directory)
 
     collection_name = "faces_nnnnn"
@@ -111,8 +111,8 @@ def check_data_in_chroma(db, video_title):
 db = init_chroma_db()
 
 # 비디오 파일이 있는 폴더 경로
-folder_path = "/Users/sinhyoseom/Desktop/videos"
+folder_path = "{비디오 파일이 있는 폴더 경로}"
 process_videos_in_folder(db, folder_path)
 
 # 저장된 데이터를 확인
-check_data_in_chroma(db, "sihyun3")
+check_data_in_chroma(db, "{확인하고 싶은 영상 제목}")
