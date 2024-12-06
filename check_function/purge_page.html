@@ -283,7 +283,7 @@
                 if (url.includes("watch?")) {
                     videoLink = `https://www.youtube.com/${url}`;
                 } else {
-                    videoLink = `file:///Users/sinhyoseom/Desktop/videos/${url}.mp4`;  // 로컬 경로 링크 (파일 열기)
+                    videoLink = `file://{저장된 비디오 경로}.mp4`;  // 로컬 경로 링크 (파일 열기)
                 }
                 videoBlock.innerHTML = `
                     <input type="checkbox" class="item-checkbox">
